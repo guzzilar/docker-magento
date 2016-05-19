@@ -1,0 +1,18 @@
+version: '2'
+services:
+  magento1900:
+    build: .
+    command: -- ./magento-1.9.0.0-install.sh
+    ports:
+      - "80:80"
+    depends_on:
+      - magento1900_db
+    entrypoint: ./wait-for-it.sh magento1900_db:3306
+    volumes:
+      - .:/var/www/html/magento-1.9.0.0
+
+  magento1900_db:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: magento1900_db
+      MYSQL_ROOT_PASSWORD: root
