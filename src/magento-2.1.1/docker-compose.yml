@@ -9,7 +9,7 @@ services:
       - mysql
     entrypoint: ./wait-for-it.sh mysql:3306
     volumes:
-      - .:/var/www/html/magento-1.9.2.4
+      - .:/var/www/html/magento-2.1.1
 
   mysql:
     image: mysql
