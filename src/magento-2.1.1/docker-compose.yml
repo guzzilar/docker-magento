@@ -3,6 +3,7 @@ services:
   php:
     build: .
     command: -- ./install.sh
+    mem_limit: 4096m
     ports:
       - "80:80"
     depends_on:
