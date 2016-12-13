@@ -1,4 +1,4 @@
-FROM php:5.6-apache
+FROM php:7.0-apache
 
 RUN usermod -u 1000 www-data
 
@@ -11,36 +11,37 @@ RUN apt-get update && apt-get install -y --force-yes \
     libxml2-dev \
     libxslt-dev \
     libicu-dev \
-    zlib1g-dev \
-    git \
+    zlib1g-dev
 
-    && docker-php-ext-configure gd \
-        --with-freetype-dir=/usr/include/ \
-        --with-jpeg-dir=/usr/include/ \
+# Install GD library.
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
+RUN docker-php-ext-install gd
 
-    && docker-php-ext-configure intl \
+# Install INTL library.
+RUN docker-php-ext-configure intl
+RUN docker-php-ext-install intl
 
-    && docker-php-ext-install mysql \
-    && docker-php-ext-install mysqli \
+RUN docker-php-ext-install mysqli \
+    && docker-php-ext-install pdo pdo_mysql \
     && docker-php-ext-install mcrypt \
-    && docker-php-ext-install gd \
     && docker-php-ext-install soap \
     && docker-php-ext-install xsl \
-    && docker-php-ext-install pdo pdo_mysql \
-    && docker-php-ext-install intl \
     && docker-php-ext-install zip
 
 RUN a2enmod rewrite
 
-# WAIT-FOR-IT.sh
-ADD ./wait-for-it.sh ./wait-for-it.sh
-RUN chmod +x ./wait-for-it.sh
+# WAIT-FOR-IT.sh.
+ADD ./bin/wait-for-it ./bin/wait-for-it
+RUN chmod +x ./bin/wait-for-it
 
-# INSTALL.sh
-ADD ./install.sh ./install.sh
-RUN chmod +x ./install.sh
+# INSTALL.sh.
+ADD ./bin/install ./bin/install
+RUN chmod +x ./bin/install
 
+# Move PHP.ini config to server.
 COPY ./config/php.ini /usr/local/etc/php/
-ADD . ./magento-2.1.2
+
+# Add project to directory.
+ADD . ./
 
 EXPOSE 80

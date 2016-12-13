@@ -2,15 +2,17 @@ version: '2'
 services:
   php:
     build: .
-    command: -- ./install.sh
+    command: -- bin/install
     mem_limit: 4096m
     ports:
       - "80:80"
     depends_on:
       - mysql
-    entrypoint: ./wait-for-it.sh mysql:3306
+    links:
+      - mysql
+    entrypoint: bin/wait-for-it mysql:3306
     volumes:
-      - .:/var/www/html/magento-2.1.2
+      - .:/var/www/html
 
   mysql:
     image: mysql
@@ -19,4 +21,3 @@ services:
     environment:
       MYSQL_DATABASE: www
       MYSQL_ROOT_PASSWORD: root
-

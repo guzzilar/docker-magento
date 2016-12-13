@@ -36,14 +36,14 @@ while test $# -gt 0; do
 done
 
 build() {
-    docker-compose -f ./src/magento-$1/docker-compose.yml stop
-    docker-compose -f ./src/magento-$1/docker-compose.yml rm -f php
-    docker-compose -f ./src/magento-$1/docker-compose.yml rm -f mysql
+    docker-compose -f ./src/$1/docker-compose.yml stop
+    docker-compose -f ./src/$1/docker-compose.yml rm -f php
+    docker-compose -f ./src/$1/docker-compose.yml rm -f mysql
 
-    docker-compose -f ./src/magento-$1/docker-compose.yml up --build
+    docker-compose -f ./src/$1/docker-compose.yml up --build
 
     [ $2 = true ] && {
-        open http://$(docker-machine ip)/magento-$1/_build
+        open http://$(docker-machine ip)/$1
     }
 }
 
