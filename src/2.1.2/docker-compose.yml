@@ -2,7 +2,7 @@ version: '2'
 services:
   php:
     build: .
-    command: -- bin/install
+    command: -- /var/www/bin/install
     mem_limit: 4096m
     ports:
       - "80:80"
@@ -10,9 +10,9 @@ services:
       - mysql
     links:
       - mysql
-    entrypoint: bin/wait-for-it mysql:3306
+    entrypoint: /var/www/bin/wait-for-it mysql:3306
     volumes:
-      - .:/var/www/html
+      - .:/var/www
 
   mysql:
     image: mysql
