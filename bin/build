@@ -1,15 +1,21 @@
-#!/bin/sh
+#!/bin/bash
 
 target_version=""
 auto_open_browser=false
 
 while test $# -gt 0; do
     case "$1" in
-        --version-support*)
-            echo "1.9.2.2"
-            echo "1.9.2.4"
-            echo "2.1.1"
-            echo "2.1.2"
+        -h|--help*)
+            echo -e 'usage: build [--target=<version>]'
+            echo -e ''
+            echo -e 'To build the specific version, please use the following command.'
+            echo -e '  --target\tSpecify the target version that you want to build'
+            echo -e ''
+            echo -e 'The following versions are the version that this Docker supported'
+            echo -e '  2.1.2\t\tReleased at Oct 11, 2016'
+            echo -e '  2.1.1\t\tReleased at Aug 26, 2016'
+            echo -e '  1.9.2.4\tReleased at Feb 23, 2016'
+            echo -e '  1.9.2.2\tReleased at Oct 27, 2015'
             shift
             ;;
 
