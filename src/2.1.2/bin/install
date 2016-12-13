@@ -5,6 +5,8 @@ set -x
 # cd ./magento-2.1.2
 rm -R *
 
+echo "Hello Docker Magento [2.1.2]" >> index.php
+
 # unzip Magento-CE-2.1.2-2016-08-29-05-30-40.zip
 # mv Magento-CE-2.1.2-2016-08-29-05-30-40 _build
 
