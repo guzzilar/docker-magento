@@ -1,4 +1,5 @@
 FROM php:7.0-apache
+MAINTAINER Guzzilar
 
 RUN usermod -u 1000 www-data
 
@@ -31,17 +32,17 @@ RUN docker-php-ext-install mysqli \
 RUN a2enmod rewrite
 
 # WAIT-FOR-IT.sh.
-ADD ./bin/wait-for-it ./bin/wait-for-it
-RUN chmod +x ./bin/wait-for-it
+ADD ./bin/wait-for-it /var/www/bin/wait-for-it
+RUN chmod +x /var/www/bin/wait-for-it
 
 # INSTALL.sh.
-ADD ./bin/install ./bin/install
-RUN chmod +x ./bin/install
+ADD ./bin/install /var/www/bin/install
+RUN chmod +x /var/www/bin/install
 
 # Move PHP.ini config to server.
 COPY ./config/php.ini /usr/local/etc/php/
 
 # Add project to directory.
-ADD . ./
+# ADD . ./
 
 EXPOSE 80
