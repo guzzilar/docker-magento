@@ -2,6 +2,7 @@ FROM php:7.0-apache
 MAINTAINER Guzzilar
 
 RUN usermod -u 1000 www-data
+RUN echo "APACHE_RUN_USER=www-data" >> /etc/apache2/envvars
 
 RUN apt-get update && apt-get install -y --force-yes \
     unzip \

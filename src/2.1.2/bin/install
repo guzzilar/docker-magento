@@ -2,44 +2,39 @@
 
 set -x
 
-# cd ./magento-2.1.2
-rm -R *
+chown -R www-data:staff .
+chmod +x .
 
-echo "Hello Docker Magento [2.1.2]" >> index.php
+# Run installation script
+php bin/magento setup:install \
+    --cleanup-database \
+    --db-host=mysql \
+    --db-name=www \
+    --db-user=root \
+    --db-password=root \
+    --admin-firstname=Developer \
+    --admin-lastname=Omise \
+    --admin-email=nam@omise.co \
+    --admin-user=admin1234 \
+    --admin-password=admin1234 \
+    --backend-frontname=admin \
+    --currency=THB \
+    --use-rewrites=1
 
-# unzip Magento-CE-2.1.2-2016-08-29-05-30-40.zip
-# mv Magento-CE-2.1.2-2016-08-29-05-30-40 _build
+php bin/magento cron:run
+php bin/magento cron:run
 
-# cd ./magento-2.1.2
+# Deploy static view assets to make the start up phase faster.
+php bin/magento setup:static-content:deploy
 
-# php ./_build/bin/magento setup:install \
-#     --cleanup-database \
-#     --db-host=mysql \
-#     --db-name=www \
-#     --db-user=root \
-#     --db-password=root \
-#     --admin-firstname=Developer \
-#     --admin-lastname=Omise \
-#     --admin-email=nam@omise.co \
-#     --admin-user=admin1234 \
-#     --admin-password=admin1234 \
-#     --backend-frontname=admin \
-#     --currency=THB \
-#     --use-rewrites=1
+# Set developer mode
+php bin/magento deploy:mode:set developer
 
-# php ./_build/bin/magento cron:run
-# php ./_build/bin/magento cron:run
+# Above commands result in 'localhost' being in cached files - clear
+# the cache to lose that setting.
+rm -rf var/cache
 
-# # Deploy static view assets to make the start up phase faster.
-# php ./_build/bin/magento setup:static-content:deploy
+chown -R www-data:www-data .
 
-# # Set developer mode
-# php ./_build/bin/magento deploy:mode:set developer
-
-# # Above commands result in 'localhost' being in cached files - clear
-# # the cache to lose that setting.
-# rm -rf var/cache
-
-# chown -R www-data:www-data .
-
+# Run apache
 apache2-foreground
