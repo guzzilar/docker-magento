@@ -1,1 +1,3 @@
+a2enmod rewrite
+
 apache2 -D FOREGROUND

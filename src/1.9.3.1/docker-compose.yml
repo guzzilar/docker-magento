@@ -2,14 +2,11 @@ version: '2'
 services:
   php:
     build: .
-    command: -- /var/www/bin/install
+    command: ["/var/www/bin/wait-for-it", "-t", "60", "mysql:3306", "--", "/var/www/bin/install"]
     ports:
       - "80:80"
     depends_on:
       - mysql
-    links:
-      - mysql
-    entrypoint: /var/www/bin/wait-for-it mysql:3306
     volumes:
       - ./html:/var/www/html
 
