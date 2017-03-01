@@ -3,6 +3,7 @@ build=0
 build_image=0
 build_source=""
 build_version=""
+build_from_scratch=0
 
 ##
 # Show the usage of Docky.
@@ -37,6 +38,11 @@ build() {
     # Prepare platform source file if --source has specified
     local build_dir=./src/$build_version
     local build_dir_tmp=$build_dir/tmp
+
+    if [ $build_from_scratch -eq 1 ]; then
+        rm -R $build_dir/html
+        rm -R $build_dir/tmp
+    fi
 
     mkdir $build_dir_tmp
 
@@ -77,6 +83,11 @@ while [[ $# -gt 0 ]]; do
         --re-build)
             build=1
             build_image=1
+            shift
+            ;;
+
+        --remove-files)
+            build_from_scratch=1
             shift
             ;;
 
