@@ -2,7 +2,6 @@ version: '2'
 services:
   www:
     build: .
-    image: magento:1.9.3.1
     command: ["/var/www/bin/wait-for-it", "-t", "60", "db:3306", "--", "/var/www/bin/install"]
     ports:
       - "80:80"
