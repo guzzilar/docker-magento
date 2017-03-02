@@ -2,7 +2,7 @@
 a2enmod rewrite
 
 if [ -f /tmp/building/platform.zip ]; then
-    unzip -q /tmp/building/platform.zip -d /var/www/html
+    unzip /tmp/building/platform.zip -d /var/www/html
 
     cp -R /var/www/html/magento/* /var/www/html/
     cp -R /var/www/html/magento/.* /var/www/html/
