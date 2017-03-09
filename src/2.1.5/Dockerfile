@@ -46,6 +46,9 @@ RUN chmod +x /var/www/bin/wait-for-it
 ADD ./bin/install /var/www/bin/install
 RUN chmod +x /var/www/bin/install
 
+# Move PHP.ini config to server.
+ADD ./config/php.ini /usr/local/etc/php/
+
 ENV APACHE_RUN_USER www-data
 ENV APACHE_RUN_GROUP www-data
 ENV APACHE_LOG_DIR /var/log/apache2
