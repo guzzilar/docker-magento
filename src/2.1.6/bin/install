@@ -1,0 +1,10 @@
+#!/bin/bash
+a2enmod rewrite
+
+git clone https://github.com/magento/magento2.git
+git checkout v2.1.6
+
+# Remove temporary files once finish building process.
+rm -R /tmp/building
+
+apache2 -D FOREGROUND
