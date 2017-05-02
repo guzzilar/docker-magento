@@ -1,5 +1,8 @@
 #!/bin/bash
-a2enmod rewrite
+
+echo "Create Database"
+service mysql start
+mysqladmin -h localhost -P 3306 -u root -proot create www --force 2> /dev/null;
 
 if [ -f /tmp/building/platform.zip ]; then
     unzip /tmp/building/platform.zip -d /var/www/html
@@ -8,5 +11,7 @@ if [ -f /tmp/building/platform.zip ]; then
     cp -R /var/www/html/magento/.* /var/www/html/
     rm -R /var/www/html/magento
 fi
+
+chown -R www-data:www-data /var/www/html
 
 apache2 -D FOREGROUND
