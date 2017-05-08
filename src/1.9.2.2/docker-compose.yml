@@ -1,18 +1,10 @@
 version: '2'
 services:
-  php:
+  www:
     build: .
-    command: -- ./install.sh
+    image: magento:1.9.2.2
+    command: ["/var/www/bin/install"]
     ports:
       - "80:80"
-    depends_on:
-      - mysql
-    entrypoint: ./wait-for-it.sh mysql:3306
     volumes:
-      - .:/var/www/html/magento-1.9.2.2
-
-  mysql:
-    image: mysql
-    environment:
-      MYSQL_DATABASE: www
-      MYSQL_ROOT_PASSWORD: root
+      - ./html:/var/www/html
