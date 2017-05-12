@@ -1,10 +1,22 @@
 FROM php:7.0-apache
+
 LABEL maintainer "Guzzilar"
+
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+ENV APACHE_LOG_DIR /var/log/apache2
+ENV APACHE_PID_FILE /var/run/apache2.pid
+ENV APACHE_RUN_DIR /var/run/apache2
+ENV APACHE_LOCK_DIR /var/lock/apache2
+
+RUN echo "mysql-server mysql-server/root_password password root" | debconf-set-selections
+RUN echo "mysql-server mysql-server/root_password_again password root" | debconf-set-selections
 
 RUN usermod -u 1000 www-data
 
 RUN apt-get update && apt-get install -y --force-yes \
     unzip \
+    vim \
     libmcrypt-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
@@ -12,7 +24,10 @@ RUN apt-get update && apt-get install -y --force-yes \
     libxml2-dev \
     libxslt-dev \
     libicu-dev \
-    zlib1g-dev
+    zlib1g-dev \
+    mysql-client \
+    mysql-server \
+    && rm -rf /var/lib/apt
 
 # Install GD library.
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
@@ -29,34 +44,23 @@ RUN docker-php-ext-install mysqli \
     && docker-php-ext-install xsl \
     && docker-php-ext-install zip
 
-RUN a2enmod rewrite
-
 # Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-RUN php -r "if (hash_file('SHA384', 'composer-setup.php') === '55d6ead61b29c7bdee5cccfb50076874187bd9f21f65d8991d46ec5cc90518f447387fb9f76ebae1fbbacf329e583e30') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 RUN php composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
 RUN mv composer.phar /usr/local/bin/composer
 
-# WAIT-FOR-IT.sh.
-ADD ./bin/wait-for-it /var/www/bin/wait-for-it
-RUN chmod +x /var/www/bin/wait-for-it
-
-# INSTALL.sh.
+# Add INSTALL.sh.
 ADD ./bin/install /var/www/bin/install
 RUN chmod +x /var/www/bin/install
 
 # Move PHP.ini config to server.
 ADD ./config/php.ini /usr/local/etc/php/
 
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
-ENV APACHE_LOG_DIR /var/log/apache2
-ENV APACHE_PID_FILE /var/run/apache2.pid
-ENV APACHE_RUN_DIR /var/run/apache2
-ENV APACHE_LOCK_DIR /var/lock/apache2
-
+# Apache configuration
 RUN mkdir -p $APACHE_RUN_DIR $APACHE_LOCK_DIR $APACHE_LOG_DIR
+RUN a2enmod rewrite
+RUN chown www-data:www-data -R /var/www/html/
 
 COPY ./tmp /tmp/building/
 
