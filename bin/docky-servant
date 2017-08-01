@@ -1,0 +1,149 @@
+#!/bin/bash
+SRC_DIR=$(dirname $0)/../src
+
+DOCKY_EXECUTABLE_COMMANDS=("doc" "up" "build")
+
+build_env_file=""
+build_location=""
+build_version=""
+arg_position=0
+
+the_command=""
+
+###
+ # Docker-WooCommerce's document
+ ##
+doc() {
+    echo -e "Docky Document:"
+    echo -e "---------------"
+    echo -e 'usage: ./bin/start [<command>] [<version>] [<build_location>(optional)]'
+    echo -e ''
+    echo -e 'The following parameters are the version that you can assign to the second argument'
+    echo -e '\tlatest'
+}
+
+
+###
+ # Check if Docky supports a build target platform.
+ #
+ # @param $1 string  name of a platform you want to check
+ ##
+canExecute () {
+    local the_command
+
+    for the_command in ${DOCKY_EXECUTABLE_COMMANDS[@]}; do
+        [[ $the_command == $1 ]] && {
+            return 0
+        }
+    done
+
+    return 1
+}
+
+prepareBuildLocation () {
+    local _build_location=$([[ ! -z $build_location ]] && echo $build_location || echo $SRC_DIR/$build_version)
+
+    if [ $_build_location != $SRC_DIR/$build_version ]; then
+        echo "Creating a new folder at $_build_location"
+        mkdir -p $_build_location
+
+        echo "Copying build files from $SRC_DIR/$build_version/* to $_build_location/"
+        cp -R $SRC_DIR/$build_version/* $_build_location/
+    fi
+
+    build_location=$_build_location
+}
+
+###
+ # Start the container.
+ ##
+up () {
+    prepareBuildLocation
+
+    [[ ! -z $build_env_file ]] && {
+        sed -i '' -e 's|default.env|'${build_env_file}'|g' $build_location/docker-compose.yml
+    }
+
+    docker-compose -f $build_location/docker-compose.yml up
+}
+
+###
+ # Build the container.
+ ##
+build () {
+    prepareBuildLocation
+
+    [[ ! -z $build_env_file ]] && {
+        sed -i '' -e 's|default.env|'${build_env_file}'|g' $build_location/docker-compose.yml
+    }
+
+    docker-compose -f $build_location/docker-compose.yml up --build
+}
+
+
+# ..
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+# EXECUTION AREA
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+# ..
+the_command=$1
+if ! canExecute $the_command; then
+    echo ".."
+    echo "Docky: error, cannot execute \"$the_command\"."
+    echo ""
+    doc
+    exit
+fi
+
+# Remove "execute command" from arguments.
+shift
+
+# Reading arguments.
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h | --help)
+            doc
+            exit
+            ;;
+
+        --env-file=*)
+            build_env_file="${1#*=}"
+            shift
+            ;;
+
+        *)
+            [[ -z $build_version ]] && {
+                if [ ! -d $SRC_DIR/$1 ]; then
+                    echo "Docky: error, build version \"$1\" did not match with any version(s) we supported."
+                    exit
+                fi
+
+                build_version=$1
+                arg_position=1
+
+                shift
+                continue
+            }
+
+            [[ $arg_position -eq 1 ]] && {
+                build_location=$1
+
+                shift
+                continue
+            }
+            ;;
+    esac
+done
+
+# Check if build-version is specified.
+# If not, set to "latest".
+[[ ! -n $build_version ]] && { 
+    echo ".."
+    echo "Docky: error, \"build version\" is required."
+    echo ""
+
+    doc
+    exit
+}
+
+$the_command
