@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo "Create Database"
+service mysql start
+mysqladmin -h localhost -P 3306 -u root -proot create www --force 2> /dev/null;
+
+git clone https://github.com/magento/magento2.git
+git checkout v2.2.0
+
+chown -R www-data:www-data /var/www/html
+
+apache2 -D FOREGROUND
