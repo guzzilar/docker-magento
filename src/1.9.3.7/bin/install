@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Create Database"
+chown -R mysql:mysql /var/lib/mysql
+service mysql start
+mysqladmin -h localhost -P 3306 -u root -proot create www --force 2> /dev/null;
+
+chown -R www-data:www-data /var/www/html
+
+apache2 -D FOREGROUND
