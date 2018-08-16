@@ -1,4 +1,4 @@
-FROM php:7.0.25-apache-jessie
+FROM php:7.1.16-apache-jessie
 
 LABEL maintainer "Guzzilar"
 
@@ -24,9 +24,7 @@ RUN apt-get update && apt-get install -y --force-yes \
     libxml2-dev \
     libxslt-dev \
     libicu-dev \
-    zlib1g-dev \
-    mysql-client \
-    mysql-server
+    zlib1g-dev
 
 # Install GD library.
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
@@ -43,12 +41,8 @@ RUN docker-php-ext-install mysqli \
     && docker-php-ext-install xsl \
     && docker-php-ext-install zip
 
-RUN wget https://dev.mysql.com/get/mysql-apt-config_0.8.3-1_all.deb
-RUN dpkg -i mysql-apt-config_0.8.3-1_all.deb
-# RUN wget http://dev.mysql.com/get/mysql-apt-config_0.3.3-1ubuntu14.04_all.deb
-# RUN dpkg -i mysql-apt-config_0.3.3-1ubuntu14.04_all.deb
-RUN apt-get update
-RUN apt-get install -y --force-yes mysql-client
+# RUN wget https://dev.mysql.com/get/mysql-apt-config_0.8.3-1_all.deb
+# RUN dpkg -i mysql-apt-config_0.8.3-1_all.deb
 
 # Add INSTALL.sh.
 ADD ./bin/install /var/www/bin/install
